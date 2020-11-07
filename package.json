@@ -1,0 +1,31 @@
+{
+  "name": "@bluejay/theorem",
+  "version": "0.0.0",
+  "description": "Perfectly typed ORM.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bluebirds-blue-jay/theorem.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bluebirds-blue-jay/theorem/issues"
+  },
+  "homepage": "https://github.com/bluebirds-blue-jay/atheorem#readme",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha",
+    "cov": "nyc mocha",
+    "lint": "tslint --project ./",
+    "fix": "tslint --fix --project ./",
+    "compile": "tsc",
+    "build": "rm -rf dist && mkdir dist && tsc --noEmit false",
+    "prepare": "tsc",
+    "prepublishOnly": "npm run lint && npm run cov && npm run build",
+    "travis": "tsc && npm run lint && npm run cov"
+  },
+  "keywords": [
+    "typescript",
+    "orm"
+  ],
+  "author": "Sylvain Estevez",
+  "license": "MIT"
+}
