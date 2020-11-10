@@ -11,38 +11,10 @@ userTable.associate({
     targetColumn: 'user_id'
   },
   country: {
-    kind: AssociationKind.BELONGS_TO,
-    column: 'country_id',
+    kind: AssociationKind.HAS_ONE,
+    column: 'id',
     targetTable: countryTable,
     targetColumn: 'id'
-  },
-  roles: {
-    kind: AssociationKind.BELONGS_TO_MANY,
-    column: 'id',
-    targetTable: roleTable,
-    targetColumn: 'id',
-    middleTable: userRoleTable,
-    middleColumn: 'user_id'
-  }
-});
-
-userPhoneNumberTable.associate({
-  user: {
-    kind: AssociationKind.BELONGS_TO,
-    column: 'user_id',
-    targetTable: userTable,
-    targetColumn: 'id'
-  }
-});
-
-roleTable.associate({
-  users: {
-    kind: AssociationKind.BELONGS_TO_MANY,
-    column: 'id',
-    targetTable: userTable,
-    targetColumn: 'id',
-    middleTable: userRoleTable,
-    middleColumn: 'role_id'
   }
 });
 
@@ -89,12 +61,13 @@ Promise.resolve().then(async () => {
   await userTable.find({ country_id: { in: [sweden.id, usa.id] } });
 
   // Find user with given phone number
-  // await userTable.findOne({
-  //   phone_numbers: {
-  //     value: '+14155557821',
-  //     purpose: PhoneNumberPurpose.PERSONAL
-  //   }
-  // });
+  await userTable.findOne({
+    enabled: true,
+    phone_numbers: {
+      value: '+1415557821',
+      purpose: PhoneNumberPurpose.PERSONAL
+    }
+  });
 
 
 });
