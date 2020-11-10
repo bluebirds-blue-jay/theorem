@@ -18,17 +18,12 @@
       "ES2019"
     ],
     "types": [
-      "node",
-      "mocha",
-      "chai"
+      "node"
     ],
     "removeComments": true
   },
   "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "lib"
+    "src",
+    "example"
   ]
 }
