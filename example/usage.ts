@@ -10,11 +10,13 @@ userTable.associate({
     targetTable: userPhoneNumberTable,
     targetColumn: 'user_id'
   },
-  country: {
-    kind: AssociationKind.HAS_ONE,
+  roles: {
+    kind: AssociationKind.BELONGS_TO_MANY,
     column: 'id',
-    targetTable: countryTable,
-    targetColumn: 'id'
+    targetTable: roleTable,
+    targetColumn: 'id',
+    middleTable: userRoleTable,
+    middleColumn: 'user_id'
   }
 });
 

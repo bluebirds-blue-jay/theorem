@@ -1,6 +1,6 @@
 import { CountryCode } from '@bluejay/countries';
-import { THasManyAssociation, THasOneAssociation } from '../src';
-import { ICountryTable, IUserPhoneNumberTable, IUserTable } from './tables';
+import { TBelongsToManyAssociation, THasManyAssociation, THasOneAssociation } from '../src';
+import { ICountryTable, IRoleTable, IUserPhoneNumberTable, IUserRoleTable, IUserTable } from './tables';
 
 export enum PhoneNumberPurpose {
   WORK = 'work',
@@ -55,7 +55,7 @@ export type TCountry = {
 
 export type TUserAssociations = {
   phone_numbers: THasManyAssociation<'phone_numbers', IUserTable, IUserPhoneNumberTable>;
-  country: THasOneAssociation<'country', IUserTable, ICountryTable>;
+  roles: TBelongsToManyAssociation<'roles', IUserTable, IRoleTable, IUserRoleTable>;
 };
 
 export type TUserPhoneNumberAssociations = {

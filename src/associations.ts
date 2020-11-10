@@ -33,18 +33,23 @@ export type THasManyAssociation<A extends string, T extends ITable<any, any>, TT
   kind: AssociationKind.HAS_MANY;
 };
 
-// export type TBelongsToManyAssociation<A extends string, C extends TColumns, TC extends TColumns, TA extends TAssociations<TC>, MC extends TColumns, T extends ITable<C>, TT extends ITable<TC>, MT extends ITable<MC>> = TAbstractAssociation<A, C, TC, T, TT> & {
-//   kind: AssociationKind.BELONGS_TO_MANY;
-//   middleTable: MT;
-//   middleColumn: keyof MC;
-// };
+export type TBelongsToManyAssociation<A extends string, T extends ITable<any, any>, TT extends ITable<any, any>, MT extends ITable<any, any>> = MT extends ITable<infer MC, infer MA>
+  ? TAbstractAssociation<A, T, TT> & {
+      kind: AssociationKind.BELONGS_TO_MANY;
+      middleTable: MT;
+      middleColumn: keyof MC;
+    }
+  : never;
 
 export type TAssociations<C extends TColumns, A extends string = string> = {
   [alias in A]: THasOneAssociation<alias, ITable<C, any>, ITable<any, any>>
     | THasManyAssociation<alias, ITable<C, any>, ITable<any, any>>
-    | TBelongsToAssociation<alias, ITable<C, any>, ITable<any, any>>;
+    | TBelongsToAssociation<alias, ITable<C, any>, ITable<any, any>>
+    | TBelongsToManyAssociation<alias, ITable<C, any>, ITable<any, any>, ITable<any, any>>;
 };
 
 export type TAssociationDefinitions<C extends TColumns, A extends TAssociations<C>> = {
-  [alias in Exclude<keyof A, number | symbol>]: Pick<A[alias], 'kind' | 'column' | 'targetTable' | 'targetColumn'>;
+  [alias in Exclude<keyof A, number | symbol>]: A[alias] extends { kind: AssociationKind.BELONGS_TO_MANY }
+    ? Pick<A[alias], 'kind' | 'column' | 'targetTable' | 'targetColumn' | 'middleTable' | 'middleColumn'>
+    : Pick<A[alias], 'kind' | 'column' | 'targetTable' | 'targetColumn'>;
 };
