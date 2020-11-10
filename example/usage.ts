@@ -6,17 +6,46 @@ import { PhoneNumberPurpose } from './types';
 userTable.associate({
   phone_numbers: {
     kind: AssociationKind.HAS_MANY,
-    column: 'id',
     targetTable: userPhoneNumberTable,
-    targetColumn: 'user_id'
+    on: ['id', 'user_id']
   },
   roles: {
     kind: AssociationKind.BELONGS_TO_MANY,
-    column: 'id',
     targetTable: roleTable,
-    targetColumn: 'id',
     middleTable: userRoleTable,
-    middleColumn: 'user_id'
+    on: [['id', 'user_id'], ['role_id', 'id']]
+  },
+  inviter: {
+    kind: AssociationKind.HAS_ONE,
+    targetTable: userTable,
+    on: ['invited_by_id', 'id']
+  },
+  country: {
+    kind: AssociationKind.BELONGS_TO,
+    targetTable: countryTable,
+    on: ['country_id', 'id']
+  }
+});
+
+userPhoneNumberTable.associate({
+  user: {
+    kind: AssociationKind.BELONGS_TO,
+    targetTable: userTable,
+    on: ['user_id', 'id']
+  },
+  country: {
+    kind: AssociationKind.BELONGS_TO,
+    targetTable: countryTable,
+    on: ['country_id', 'id']
+  }
+});
+
+roleTable.associate({
+  users: {
+    kind: AssociationKind.BELONGS_TO_MANY,
+    targetTable: userTable,
+    middleTable: userRoleTable,
+    on: [['id', 'role_id'], ['user_id', 'id']]
   }
 });
 
@@ -40,8 +69,8 @@ Promise.resolve().then(async () => {
   });
 
   await userPhoneNumberTable.create([
-    { user_id: john.id, value: '+46705552068', purpose: PhoneNumberPurpose.PERSONAL },
-    { user_id: jane.id, value: '+14155557821', purpose: PhoneNumberPurpose.PERSONAL }
+    { user_id: john.id, value: '+46705552068', purpose: PhoneNumberPurpose.PERSONAL, country_id: sweden.id },
+    { user_id: jane.id, value: '+14155557821', purpose: PhoneNumberPurpose.PERSONAL, country_id: usa.id }
   ]);
 
   await userRoleTable.create([

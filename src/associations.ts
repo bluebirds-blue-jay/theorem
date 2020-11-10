@@ -8,37 +8,50 @@ export enum AssociationKind {
   BELONGS_TO_MANY = 'belongs_to_many'
 }
 
-export type TAbstractAssociation<A extends string, T extends ITable<any, any>, TT extends ITable<any, any>> = T extends ITable<infer C, any>
+export type TAbstractAssociation<A extends string, T extends ITable<any, any>, TT extends ITable<any, any>> = {
+  alias: A;
+  kind: AssociationKind;
+  table: T;
+  targetTable: TT;
+};
+
+export type THasOneAssociation<A extends string, T extends ITable<any, any>, TT extends ITable<any, any>> = T extends ITable<infer C, any>
   ? TT extends ITable<infer TC, infer TA>
-    ? {
-      alias: A;
-      kind: AssociationKind;
-      table: T;
-      column: keyof C;
-      targetTable: TT;
-      targetColumn: keyof TC;
-    }
+    ? TAbstractAssociation<A, T, TT> & {
+        kind: AssociationKind.HAS_ONE;
+        on: [keyof C, keyof TC]
+      }
     : never
   : never;
 
-export type THasOneAssociation<A extends string, T extends ITable<any, any>, TT extends ITable<any, any>> = TAbstractAssociation<A, T, TT> & {
-  kind: AssociationKind.HAS_ONE;
-};
+export type TBelongsToAssociation<A extends string, T extends ITable<any, any>, TT extends ITable<any, any>> =  T extends ITable<infer C, any>
+  ? TT extends ITable<infer TC, infer TA>
+    ? TAbstractAssociation<A, T, TT> & {
+        kind: AssociationKind.BELONGS_TO;
+        on: [keyof C, keyof TC]
+      }
+    : never
+  : never;
 
-export type TBelongsToAssociation<A extends string, T extends ITable<any, any>, TT extends ITable<any, any>> = TAbstractAssociation<A, T, TT> & {
-  kind: AssociationKind.BELONGS_TO;
-};
+export type THasManyAssociation<A extends string, T extends ITable<any, any>, TT extends ITable<any, any>> =  T extends ITable<infer C, any>
+  ? TT extends ITable<infer TC, infer TA>
+    ? TAbstractAssociation<A, T, TT> & {
+        kind: AssociationKind.HAS_MANY;
+        on: [keyof C, keyof TC]
+      }
+    : never
+  : never;
 
-export type THasManyAssociation<A extends string, T extends ITable<any, any>, TT extends ITable<any, any>> = TAbstractAssociation<A, T, TT> & {
-  kind: AssociationKind.HAS_MANY;
-};
-
-export type TBelongsToManyAssociation<A extends string, T extends ITable<any, any>, TT extends ITable<any, any>, MT extends ITable<any, any>> = MT extends ITable<infer MC, infer MA>
-  ? TAbstractAssociation<A, T, TT> & {
-      kind: AssociationKind.BELONGS_TO_MANY;
-      middleTable: MT;
-      middleColumn: keyof MC;
-    }
+export type TBelongsToManyAssociation<A extends string, T extends ITable<any, any>, TT extends ITable<any, any>, MT extends ITable<any, any>> =  T extends ITable<infer C, any>
+  ? TT extends ITable<infer TC, infer TA>
+    ? MT extends ITable<infer MC, infer MA>
+      ? TAbstractAssociation<A, T, TT> & {
+          kind: AssociationKind.BELONGS_TO_MANY;
+          middleTable: MT;
+          on: [[keyof C, keyof MC], [keyof MC, keyof TC]]
+        }
+      : never
+    : never
   : never;
 
 export type TAssociations<C extends TColumns, A extends string = string> = {
@@ -50,6 +63,6 @@ export type TAssociations<C extends TColumns, A extends string = string> = {
 
 export type TAssociationDefinitions<C extends TColumns, A extends TAssociations<C>> = {
   [alias in Exclude<keyof A, number | symbol>]: A[alias] extends { kind: AssociationKind.BELONGS_TO_MANY }
-    ? Pick<A[alias], 'kind' | 'column' | 'targetTable' | 'targetColumn' | 'middleTable' | 'middleColumn'>
-    : Pick<A[alias], 'kind' | 'column' | 'targetTable' | 'targetColumn'>;
+    ? Pick<A[alias], 'kind' | 'targetTable' | 'on' | 'middleTable'>
+    : Pick<A[alias], 'kind' | 'targetTable' | 'on'>;
 };

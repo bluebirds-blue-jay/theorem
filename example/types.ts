@@ -1,5 +1,5 @@
 import { CountryCode } from '@bluejay/countries';
-import { TBelongsToManyAssociation, THasManyAssociation, THasOneAssociation } from '../src';
+import { ITable, TBelongsToAssociation, TBelongsToManyAssociation, THasManyAssociation, THasOneAssociation } from '../src';
 import { ICountryTable, IRoleTable, IUserPhoneNumberTable, IUserRoleTable, IUserTable } from './tables';
 
 export enum PhoneNumberPurpose {
@@ -23,6 +23,7 @@ export type TUser = {
 export type TUserPhoneNumber = {
   readonly id: number;
   user_id: TUser['id'];
+  country_id: TCountry['id'];
   value: string;
   purpose: PhoneNumberPurpose;
   verified?: boolean | false;
@@ -56,12 +57,16 @@ export type TCountry = {
 export type TUserAssociations = {
   phone_numbers: THasManyAssociation<'phone_numbers', IUserTable, IUserPhoneNumberTable>;
   roles: TBelongsToManyAssociation<'roles', IUserTable, IRoleTable, IUserRoleTable>;
+  // We can't simply use IUserTable here, as it would result in a cyclic dependency.
+  inviter: THasOneAssociation<'inviter', IUserTable, ITable<TUser, Omit<TUserAssociations, 'inviter'>>>;
+  country: TBelongsToAssociation<'country', IUserTable, ICountryTable>;
 };
 
 export type TUserPhoneNumberAssociations = {
-
+  user: TBelongsToAssociation<'user', IUserPhoneNumberTable, ITable<TUser, Omit<TUserAssociations, 'phone_numbers' | 'inviter'>>>;
+  country: TBelongsToAssociation<'country', IUserPhoneNumberTable, ICountryTable>;
 };
 
 export type TRoleAssociations = {
-
+  users: TBelongsToManyAssociation<'users', IRoleTable, ITable<TUser, Omit<TUserAssociations, 'roles' | 'phone_numbers' | 'inviter'>>, IUserRoleTable>;
 };
