@@ -1,12 +1,13 @@
 import { TAssociationDefinitions, TAssociations } from './associations';
-import { TColumns, TCreateValues, TRecord, TUpdateValues } from './column';
+import { TColumns, TCreateValues, TRecord, TSelectableRecord, TUpdateValues } from './column';
+import { TFindOneOptions, TFindOptions, TIfExists } from './options';
 import { TReadWhere, TWriteWhere } from './where';
 
 export interface ITable<C extends TColumns, A extends TAssociations<C> = never> {
   create<T extends TCreateValues<C> | TCreateValues<C>[]>(values: T): Promise<T extends TCreateValues<C>[] ? TRecord<C>[] : TRecord<C>>;
 
-  find(where?: TReadWhere<C, A>): Promise<TRecord<C>[]>;
-  findOne(where?: TReadWhere<C, A>): Promise<TRecord<C> | undefined>;
+  find<O extends TFindOptions<C, A>>(where?: TReadWhere<C, A>, options?: O): Promise<TSelectableRecord<C, A, O>[]>;
+  findOne<O extends TFindOneOptions<C, A>>(where?: TReadWhere<C, A>, options?: O): Promise<TSelectableRecord<C, A, O>>;
   count(where: TReadWhere<C, A>): Promise<number>;
 
   update(where: TWriteWhere<C, A>, values: TUpdateValues<C>): Promise<number>;
