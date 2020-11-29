@@ -21,7 +21,7 @@ export type TUser = {
 };
 
 export type TUserPhoneNumber = {
-  readonly id: number;
+  readonly id: string;
   user_id: TUser['id'];
   country_id: TCountry['id'];
   value: string;

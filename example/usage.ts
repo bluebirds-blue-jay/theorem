@@ -91,7 +91,7 @@ Promise.resolve().then(async () => {
   // Find users from Sweden OR USA
   await userTable.find({ country_id: { in: [sweden.id, usa.id] } });
 
-  // Find user with given phone number
+  // Find enabled user with given phone number
   const u = await userTable.findOne({
     enabled: true,
     phone_numbers: {
@@ -99,8 +99,7 @@ Promise.resolve().then(async () => {
       purpose: PhoneNumberPurpose.PERSONAL
     }
   }, {
-    exists: true,
-    select: ['id', 'email', 'enabled']
+    exists: true
   });
 
   console.log(u.id);
