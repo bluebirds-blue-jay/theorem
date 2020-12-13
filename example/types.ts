@@ -1,5 +1,6 @@
 import { CountryCode } from '@bluejay/countries';
 import { ITable, TBelongsToAssociation, TBelongsToManyAssociation, THasManyAssociation, THasOneAssociation } from '../src';
+import { PK } from '../src/column';
 import { ICountryTable, IRoleTable, IUserPhoneNumberTable, IUserRoleTable, IUserTable } from './tables';
 
 export enum PhoneNumberPurpose {
@@ -8,7 +9,7 @@ export enum PhoneNumberPurpose {
 }
 
 export type TUser = {
-  readonly id: number;
+  readonly id: PK<number>;
   email: string;
   country_id: TCountry['id'];
   first_name: string;

@@ -1,7 +1,8 @@
 import { CountryCode } from '@bluejay/countries';
 import { AssociationKind } from '../';
+import { TPrimaryKeyValues } from '../src/column';
 import { countryTable, roleTable, userPhoneNumberTable, userRoleTable, userTable } from './tables';
-import { PhoneNumberPurpose } from './types';
+import { PhoneNumberPurpose, TUser } from './types';
 
 userTable.associate({
   phone_numbers: {
@@ -50,9 +51,9 @@ roleTable.associate({
 });
 
 Promise.resolve().then(async () => {
-  const [sweden, usa] = await countryTable.create([{ code: CountryCode.SE }, { code: CountryCode.US }]);
+  const [sweden, usa] = await countryTable.createMany([{ code: CountryCode.SE }, { code: CountryCode.US }]);
 
-  const [customerRole, adminRole] = await roleTable.create([{ identifier: 'customer' }, { identifier: 'admin' }]);
+  const [customerRole, adminRole] = await roleTable.createMany([{ identifier: 'customer' }, { identifier: 'admin' }]);
 
   const john = await userTable.create({
     email: 'john@theorem.com',
@@ -68,12 +69,12 @@ Promise.resolve().then(async () => {
     country_id: usa.id
   });
 
-  await userPhoneNumberTable.create([
+  await userPhoneNumberTable.createMany([
     { user_id: john.id, value: '+46705552068', purpose: PhoneNumberPurpose.PERSONAL, country_id: sweden.id },
     { user_id: jane.id, value: '+14155557821', purpose: PhoneNumberPurpose.PERSONAL, country_id: usa.id }
   ]);
 
-  await userRoleTable.create([
+  await userRoleTable.createMany([
     { user_id: john.id, role_id: customerRole.id },
     { user_id: jane.id, role_id: adminRole.id }
   ]);
@@ -91,7 +92,7 @@ Promise.resolve().then(async () => {
   // Find users from Sweden OR USA
   await userTable.find({ country_id: { in: [sweden.id, usa.id] } });
 
-  // Find enabled user with given phone number
+  // Find enabled user with given phone number, and include filtered phone numbers.
   const u = await userTable.findOne({
     enabled: true,
     phone_numbers: {
@@ -99,11 +100,11 @@ Promise.resolve().then(async () => {
       purpose: PhoneNumberPurpose.PERSONAL
     }
   }, {
-    exists: true
+    // select: ['id', 'email', 'enabled']
+    select: ['id', 'email']
   });
 
-  console.log(u.id);
-  console.log(u.email);
-
-
+  console.log(u!.id);
+  console.log(u!.email);
+  console.log(u!.enabled);
 });

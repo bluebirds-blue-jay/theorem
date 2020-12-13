@@ -1,17 +1,30 @@
 import { TAssociationDefinitions, TAssociations } from './associations';
-import { TColumns, TCreateValues, TRecord, TUpdateValues } from './column';
-import { TFindOneOptions, TFindOptions } from './options';
+import { TColumns, TCreateValues, TPrimaryKeyValues, TReadValues, TUpdateValues } from './column';
+import { TFindByPrimaryKeyOptions, TFindOneOptions, TFindOptions } from './options';
+import { TRecord } from './record';
 import { TReadWhere, TWriteWhere } from './where';
 
-export interface ITable<C extends TColumns, A extends TAssociations<C> = never> {
-  create<T extends TCreateValues<C> | TCreateValues<C>[]>(values: T): Promise<T extends TCreateValues<C>[] ? TRecord<C>[] : TRecord<C>>;
+/**
+ * A table object maps directly to a table in the database.
+ *
+ * Col represents the columns in the table.
+ * Ass represents the relations to the table.
+ * Vir represents the virtual properties defined for the table.
+ */
+export interface ITable<Col extends TColumns, Ass extends TAssociations<Col> = never, Vir extends {} = {}> {
+  create(values: TCreateValues<Col>): Promise<TReadValues<Col>>;
+  createMany(values: TCreateValues<Col>[]): Promise<TReadValues<Col>[]>;
 
-  find<O extends TFindOptions<C, A>>(where?: TReadWhere<C, A>, options?: O): Promise<TRecord<C>[]>;
-  findOne<O extends TFindOneOptions<C, A>>(where?: TReadWhere<C, A>, options?: O): Promise<TRecord<C>>;
-  count(where: TReadWhere<C, A>): Promise<number>;
+  findOne<Opt extends TFindOneOptions<Col, Ass>>(where?: TReadWhere<Col, Ass>, options?: Opt): Promise<TRecord<Col, Ass, Opt> | null>;
+  findByPrimaryKey<Opt extends TFindByPrimaryKeyOptions<Col, Ass>>(pk: TPrimaryKeyValues<Col>): Promise<TRecord<Col, Ass, Opt> | null>;
 
-  update(where: TWriteWhere<C, A>, values: TUpdateValues<C>): Promise<number>;
-  delete(where: TWriteWhere<C, A>): Promise<number>;
 
-  associate(definitions: TAssociationDefinitions<C, A>): void;
+
+  find<O extends TFindOptions<Col, Ass>>(where?: TReadWhere<Col, Ass>, options?: O): Promise<TReadValues<Col>[]>;
+  count(where: TReadWhere<Col, Ass>): Promise<number>;
+
+  update(where: TWriteWhere<Col, Ass>, values: TUpdateValues<Col>): Promise<number>;
+  delete(where: TWriteWhere<Col, Ass>): Promise<number>;
+
+  associate(definitions: TAssociationDefinitions<Col, Ass>): void;
 }

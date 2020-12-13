@@ -1,5 +1,5 @@
 import { TAssociations } from './associations';
-import { TColumns, TSQLDataType } from './column';
+import { TColumns} from './column';
 import { ITable } from './table';
 
 export type TOperator = 'in' | 'nin' | 'notIn' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'like' | 'between' | 'isNull' | 'isNotNull';
@@ -9,23 +9,23 @@ export type TNullOperator = 'isNull' | 'isNotNull';
 export type TBetweenOperator = 'between';
 export type TLikeOperator = 'like';
 
-export type TSimpleOperatorWhere<T extends TSQLDataType> = {
+export type TSimpleOperatorWhere<T> = {
   [O in TSimpleOperator]: T;
 };
 
-export type TInOperatorWhere<T extends TSQLDataType> = {
+export type TInOperatorWhere<T> = {
   [O in TInOperator]: T[];
 };
 
-export type TNullOperatorWhere<T extends TSQLDataType> = {
+export type TNullOperatorWhere<T> = {
   [O in TNullOperator]: boolean;
 };
 
-export type TBetweenOperatorWhere<T extends TSQLDataType> = {
+export type TBetweenOperatorWhere<T> = {
   [O in TBetweenOperator]: [T, T];
 };
 
-export type TLikeOperatorWhere<T extends TSQLDataType> = {
+export type TLikeOperatorWhere<T> = {
   [O in TLikeOperator]: string;
 };
 
